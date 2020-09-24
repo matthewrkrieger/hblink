@@ -42,14 +42,14 @@ from twisted.protocols.basic import NetstringReceiver
 from twisted.internet import reactor, task
 
 # Other files we pull from -- this is mostly for readability and segmentation
-import log
-import config
-from const import *
+import core.log as log
+import core.config as config
+from core.const import *
 from dmr_utils3.utils import int_id, bytes_4, try_download, mk_id_dict
 
 # Imports for the reporting server
 import pickle
-from reporting_const import *
+from core.reporting_const import *
 
 # The module needs logging logging, but handlers, etc. are controlled by the parent
 import logging
@@ -327,7 +327,7 @@ class HBSYSTEM(DatagramProtocol):
     # Aliased in __init__ to datagramReceived if system is a master
     def master_datagramReceived(self, _data, _sockaddr):
         # Keep This Line Commented Unless HEAVILY Debugging!
-        # logger.debug('(%s) RX packet from %s -- %s', self._system, _sockaddr, ahex(_data))
+        logger.debug('(%s) RX packet from %s -- %s', self._system, _sockaddr, ahex(_data))
 
         # Extract the command, which is various length, all but one 4 significant characters -- RPTCL
         _command = _data[:4]

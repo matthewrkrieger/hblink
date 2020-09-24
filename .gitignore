@@ -89,10 +89,8 @@ ENV/
 .ropeproject
 
 .DS_Store
-hblink.cfg
 *.config
 *.bak
-rules.py
 subscriber_ids.*
 local_subscriber_ids.*
 peer_ids.*

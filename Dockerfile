@@ -1,30 +1,30 @@
-FROM python:3.7-slim-stretch
+FROM alpine:latest AS base
 
-RUN apt update && \
-    apt install -y git && \
-    cd /usr/src/ && \
-    git clone https://github.com/n0mjs710/dmr_utils3 && \
-    cd /usr/src/dmr_utils3 && \
-    ./install.sh && \
-    rm -rf /var/lib/apt/lists/* && \
-    cd /opt && \
-    rm -rf /usr/src/dmr_utils3 && \
-    git clone https://github.com/n0mjs710/hblink3
-ENV AAA BBBB
-RUN cd /opt/hblink3/ && \
-    sed -i s/.*python.*//g  requirements.txt && \
-    pip install --no-cache-dir -r requirements.txt
+RUN apk --no-cache update && \ 
+    apk --no-cache upgrade && \
+    apk --no-cache add python3 py-pip && \
+    pip3 install --ignore-installed distlib pipenv && \
+    addgroup -g 1000 runner && \
+    adduser -D -u 1000 -G runner runner && \
+    mkdir /app && chown -R runner:runner /app
 
+FROM base AS build-tools
+RUN apk --no-cache add \
+    build-base \
+    python3-dev 
 
-ADD entrypoint /entrypoint
+FROM build-tools as builder
+USER runner
+ADD . /app
+WORKDIR /app
+RUN pipenv install
 
-RUN adduser -u 54000 radio && \
-    adduser radio radio && \
-    chmod 755 /entrypoint && \
-    chown radio:radio /entrypoint && \
-    chown radio /opt/hblink3
+FROM base AS hblink
+COPY --from=builder /home/runner/.local /home/runner/.local
+COPY . /app
+USER runner
+WORKDIR /app
 
-USER radio 
-EXPOSE 54000
+EXPOSE 62030
 
-ENTRYPOINT [ "/entrypoint" ]
+ENTRYPOINT [ "/app/docker_entrypoint.sh" ]

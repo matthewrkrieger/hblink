@@ -1,0 +1,26 @@
+version: "3"
+services:
+    bridge:
+        container_name: hblink-bridge
+        image: hblink
+        
+        entrypoint: ['./docker-entrypoint.sh']
+        environment:
+            - ROLE=bridge
+        ports:
+            - "62030"
+        volumes:
+            - ./bridge.cfg:/app/hblink.cfg:ro
+
+    playback:
+        container_name: hblink-playback
+        image: hblink
+        
+        entrypoint: ['./docker-entrypoint.sh']
+        environment:
+            - ROLE=playback
+        expose:
+            - "62031"
+
+        volumes:
+            - ./playback.cfg:/app/hblink.cfg:ro
